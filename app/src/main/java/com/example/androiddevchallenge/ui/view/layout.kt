@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
@@ -127,7 +128,7 @@ fun MyApp() {
 
     var isSetDialog by remember { mutableStateOf(false) }
 
-    var progress by remember { mutableStateOf(0.1f) }
+    var progress by remember { mutableStateOf(0.7f) }
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
@@ -140,6 +141,9 @@ fun MyApp() {
         title = {
             Text(text = stringResource(R.string.alarm_label))
         },
+        text = {
+            Text(text = stringResource(R.string.alarm_text))
+        },
         confirmButton = {
             TextButton(
                 onClick = {
@@ -150,6 +154,7 @@ fun MyApp() {
             }
         }
     ) else if (isSetDialog) CountdownSetDialog(
+        seconds = model.countdown,
         cancelAction = {
             isSetDialog = false
         },
@@ -162,8 +167,7 @@ fun MyApp() {
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.workspaceSize().padding(32.dp), contentAlignment = Alignment.Center) {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.background(colorResource(R.color.gray))) {
-                CircularProgressIndicator(modifier = Modifier.requiredWidth(240.dp), progress = animatedProgress)
+                CircularProgressIndicator(modifier = Modifier.requiredWidth(300.dp).offset(y = -(150).dp), progress = animatedProgress)
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     val isAlarm = model.secondsToAlarm <= 0
                     Text(
@@ -178,7 +182,7 @@ fun MyApp() {
                         }
                         Spacer(Modifier.width(16.dp))
                         IconButton(onClick = {
-                            if (progress < 1f) progress += 0.1f
+                            progress = 0f
                             model.resetCountdown()
                         }) {
                             Icon(Icons.Outlined.RestartAlt, contentDescription = "Reset", tint = colorResource(R.color.reset))
@@ -205,26 +209,26 @@ fun MyApp() {
                         }
                     }
                 }
-            }
         }
     }
 }
 
 @Composable
-private fun CountdownSetDialog(cancelAction: () -> Unit, doneAction: (Int) -> Unit) {
+private fun CountdownSetDialog(seconds: Int, cancelAction: () -> Unit, doneAction: (Int) -> Unit) {
     Dialog(onDismissRequest = {
         cancelAction()
     }) {
         Surface(modifier = Modifier.dialogSize(), shape = MaterialTheme.shapes.medium) {
             Column {
-                var h by remember { mutableStateOf(0) }
-                var m by remember { mutableStateOf(0) }
-                var s by remember { mutableStateOf(0) }
+                val data = splitSeconds(seconds)
+                var h by remember { mutableStateOf(data.first) }
+                var m by remember { mutableStateOf(data.second) }
+                var s by remember { mutableStateOf(data.third) }
                 Column(modifier = Modifier.padding(16.dp)) {
                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
                         Text(text = stringResource(R.string.dialog_set_title), style = MaterialTheme.typography.h6)
                     }
-                    Column(modifier = Modifier.fillMaxWidth().padding(top = 32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(top = 36.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(text = "$h h", style = MaterialTheme.typography.h5, fontWeight = FontWeight.Light)
                         Slider(
                             value = h.toFloat(),
@@ -251,11 +255,15 @@ private fun CountdownSetDialog(cancelAction: () -> Unit, doneAction: (Int) -> Un
                     }
                 }
                 Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp), horizontalArrangement = Arrangement.End) {
-                    TextButton(onClick = { cancelAction() }) {
+                    TextButton(onClick = {
+                        cancelAction()
+                    }) {
                         Text(stringResource(R.string.cancel_label))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    TextButton(onClick = { doneAction(100) }) {
+                    TextButton(onClick = {
+                        doneAction(3600 * h + 60 * m + s)
+                    }) {
                         Text(stringResource(R.string.set_label))
                     }
                 }
@@ -264,10 +272,12 @@ private fun CountdownSetDialog(cancelAction: () -> Unit, doneAction: (Int) -> Un
     }
 }
 
-private fun getTimeLabel(seconds: Int): String {
-    val h = (seconds / 3600).toInt().toString()
-    val m = ((seconds % 3600) / 60).toInt().toString().padStart(2, '0')
-    val s = (seconds % 60).toString().padStart(2, '0')
-    return "$h:$m:$s"
-}
+private fun splitSeconds(seconds: Int) = Triple(
+    (seconds / 3600).toInt(),
+    ((seconds % 3600) / 60).toInt(),
+    seconds % 60
+)
 
+private fun getTimeLabel(seconds: Int) = splitSeconds(seconds).let {
+    "${it.first}:${it.second.toString().padStart(2, '0')}:${it.third.toString().padStart(2, '0')}"
+}
