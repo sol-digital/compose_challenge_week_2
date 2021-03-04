@@ -10,11 +10,28 @@
   the License.
   -->
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="fake">#00000000</color>
+    <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
+    <color name="gray">#808080</color>
+    <color name="gold">#c5b358</color>
+    <color name="sepia">#ac7a33</color>
+
+    <color name="splashBackground">#212121</color>
+    <color name="statusBar">#ffffff</color>
+    <color name="navBar">#212121</color>
+    <color name="edgeEffect">#757575</color>
+    <color name="background">#e5e5e5</color>
+
+    <!-- Indigo 500 -->
+    <color name="primary">#3f51b5</color>
+    <color name="primaryLight">#757de8</color>
+    <color name="primaryDark">#002984</color>
+    <color name="onPrimary">#ffffff</color>
+
+    <!-- Green A700 -->
+    <color name="secondary">#00c853</color>
+    <color name="secondaryLight">#5efc82</color>
+    <color name="secondaryDark">#009624</color>
+    <color name="onSecondary">#000000</color>
 </resources>
