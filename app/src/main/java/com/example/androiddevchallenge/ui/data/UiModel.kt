@@ -22,26 +22,6 @@ import androidx.lifecycle.ViewModel
 
 class UiModel : ViewModel() {
 
-    var currentScreen by mutableStateOf(PuppiesScreen() as ScreenData)
-        private set
+    var isDone by mutableStateOf(false)
 
-    private val backStack = arrayListOf<ScreenData>()
-
-    val isRootScreen
-        get() = backStack.isEmpty()
-
-    private fun setScreen(screen: ScreenData) {
-        backStack.clear()
-        currentScreen = screen
-    }
-
-    fun addScreen(screen: ScreenData) {
-        backStack.add(currentScreen)
-        currentScreen = screen
-    }
-
-    fun closeScreen(): Boolean = if (backStack.size > 0) {
-        currentScreen = backStack.removeLast()
-        true
-    } else false
 }

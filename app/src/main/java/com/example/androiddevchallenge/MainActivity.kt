@@ -51,14 +51,12 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         backToast?.cancel()
 
-        val isHome = model.isRootScreen
-        var needShowToast = isHome
+        var needShowToast = true
         if (backToast != null) {
             backToast = null
             needShowToast = false
         }
         when {
-            !model.isRootScreen -> model.closeScreen()
             needShowToast -> backToast = Toast.makeText(applicationContext, getString(R.string.toast_back_label), Toast.LENGTH_SHORT).apply {
                 setGravity(Gravity.CENTER, 0, 0)
                 show()
