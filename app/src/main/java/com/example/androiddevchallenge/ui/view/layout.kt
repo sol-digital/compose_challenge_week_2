@@ -184,7 +184,6 @@ fun MyApp() {
             )
             CircularProgressIndicator(
                 modifier = Modifier.requiredWidth(300.dp).offset(y = -(150).dp),
-//                    progress = if (model.isRunning || targetProgress == 0f) animatedProgress else targetProgress
                 progress = animatedProgress
             )
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
