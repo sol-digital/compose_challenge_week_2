@@ -55,7 +55,7 @@ class UiModel : ViewModel() {
 
     var isDone by mutableStateOf(false)
 
-    var countdown by mutableStateOf(30)
+    var countdown by mutableStateOf(300)
 
     var secondsToAlarm by mutableStateOf(countdown)
 

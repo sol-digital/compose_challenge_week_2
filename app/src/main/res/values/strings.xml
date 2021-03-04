@@ -11,7 +11,11 @@
       -->
     <string name="app_name">AndroidDevChallenge</string>
 
+    <string name="dialog_set_title">Set countdown</string>
+
     <string name="toast_back_label">For exit do it again</string>
     <string name="alarm_label">Alarm!</string>
     <string name="close_label">Close</string>
+    <string name="set_label">Set</string>
+    <string name="cancel_label">Cancel</string>
 </resources>
