@@ -15,29 +15,26 @@
  */
 package com.example.androiddevchallenge.ui.view
 
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProgressIndicatorDefaults
@@ -59,10 +56,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -128,10 +122,26 @@ fun MyApp() {
 
     var isSetDialog by remember { mutableStateOf(false) }
 
-    var progress by remember { mutableStateOf(0.7f) }
+//    val animatedProgress = when {
+//        model.secondsCountdown == model.secondsToAlarm -> 0f
+//        model.secondsToAlarm == 0 -> 1f
+//        else -> 1f - model.secondsToAlarm.toFloat() / model.secondsCountdown.toFloat()
+//    }
+
+    val targetProgress = when {
+        model.secondsCountdown == 0 -> 0f
+        model.isDone -> 1f
+        model.isRunning -> min(1f, 1f - (model.secondsToAlarm - 1f) / model.secondsCountdown.toFloat())
+        model.secondsCountdown == model.secondsToAlarm -> 0f
+        else -> 1f - model.secondsToAlarm.toFloat() / model.secondsCountdown.toFloat()
+    }
+
     val animatedProgress by animateFloatAsState(
-        targetValue = progress,
-        animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
+        targetValue = targetProgress,
+        animationSpec = if (!model.isRunning) ProgressIndicatorDefaults.ProgressAnimationSpec else tween(
+            durationMillis = 1000,
+            easing = LinearEasing
+        )
     )
 
     if (model.isDone) AlertDialog(
@@ -154,12 +164,12 @@ fun MyApp() {
             }
         }
     ) else if (isSetDialog) CountdownSetDialog(
-        seconds = model.countdown,
+        seconds = model.secondsCountdown,
         cancelAction = {
             isSetDialog = false
         },
         doneAction = {
-            model.countdown = it
+            model.secondsCountdown = it
             model.resetCountdown()
             isSetDialog = false
         }
@@ -167,57 +177,71 @@ fun MyApp() {
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.workspaceSize().padding(32.dp), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(modifier = Modifier.requiredWidth(300.dp).offset(y = -(150).dp), progress = animatedProgress)
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    val isAlarm = model.secondsToAlarm <= 0
-                    Text(
-                        text = if (isAlarm) stringResource(R.string.alarm_label) else getTimeLabel(model.secondsToAlarm),
-                        style = MaterialTheme.typography.h2
-                    )
-                    Row(modifier = Modifier.padding(top = 32.dp)) {
-                        IconButton(onClick = {
+            CircularProgressIndicator(
+                modifier = Modifier.requiredWidth(300.dp).offset(y = -(150).dp),
+                progress = 1f,
+                color = MaterialTheme.colors.primary.copy(alpha = 0.2f)
+            )
+            CircularProgressIndicator(
+                modifier = Modifier.requiredWidth(300.dp).offset(y = -(150).dp),
+//                    progress = if (model.isRunning || targetProgress == 0f) animatedProgress else targetProgress
+                progress = animatedProgress
+            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                val isAlarm = model.secondsToAlarm <= 0
+                Text(
+                    text = if (isAlarm) stringResource(R.string.alarm_label) else getTimeLabel(model.secondsToAlarm),
+                    style = MaterialTheme.typography.h2
+                )
+                Row(modifier = Modifier.padding(top = 32.dp)) {
+                    IconButton(
+                        onClick = {
                             isSetDialog = true
-                        }) {
-                            Icon(Icons.Outlined.Edit, contentDescription = "Set", tint = colorResource(R.color.primary))
                         }
-                        Spacer(Modifier.width(16.dp))
-                        IconButton(onClick = {
-                            progress = 0f
+                    ) {
+                        Icon(Icons.Outlined.Edit, contentDescription = "Set", tint = colorResource(R.color.primary))
+                    }
+                    Spacer(Modifier.width(16.dp))
+                    IconButton(
+                        onClick = {
                             model.resetCountdown()
-                        }) {
-                            Icon(Icons.Outlined.RestartAlt, contentDescription = "Reset", tint = colorResource(R.color.reset))
                         }
-                        Spacer(Modifier.width(16.dp))
-                        if (model.isRunning) {
-                            IconButton(
-                                onClick = {
-                                    model.stopCountdown()
-                                },
-                                enabled = !isAlarm
-                            ) {
-                                Icon(Icons.Outlined.PauseCircle, contentDescription = "Stop", tint = colorResource(if (isAlarm) R.color.gray else R.color.stop))
-                            }
-                        } else {
-                            IconButton(
-                                onClick = {
-                                    model.startCountdown()
-                                },
-                                enabled = !isAlarm
-                            ) {
-                                Icon(Icons.Outlined.PlayCircle, contentDescription = "Start", tint = colorResource(if (isAlarm) R.color.gray else R.color.start))
-                            }
+                    ) {
+                        Icon(Icons.Outlined.RestartAlt, contentDescription = "Reset", tint = colorResource(R.color.reset))
+                    }
+                    Spacer(Modifier.width(16.dp))
+                    if (model.isRunning) {
+                        IconButton(
+                            onClick = {
+                                model.stopCountdown()
+                            },
+                            enabled = !isAlarm
+                        ) {
+                            Icon(Icons.Outlined.PauseCircle, contentDescription = "Stop", tint = colorResource(if (isAlarm) R.color.gray else R.color.stop))
+                        }
+                    } else {
+                        IconButton(
+                            onClick = {
+                                model.startCountdown()
+                            },
+                            enabled = !isAlarm
+                        ) {
+                            Icon(Icons.Outlined.PlayCircle, contentDescription = "Start", tint = colorResource(if (isAlarm) R.color.gray else R.color.start))
                         }
                     }
                 }
+            }
         }
     }
 }
 
 @Composable
 private fun CountdownSetDialog(seconds: Int, cancelAction: () -> Unit, doneAction: (Int) -> Unit) {
-    Dialog(onDismissRequest = {
-        cancelAction()
-    }) {
+    Dialog(
+        onDismissRequest = {
+            cancelAction()
+        }
+    ) {
         Surface(modifier = Modifier.dialogSize(), shape = MaterialTheme.shapes.medium) {
             Column {
                 val data = splitSeconds(seconds)
@@ -255,15 +279,19 @@ private fun CountdownSetDialog(seconds: Int, cancelAction: () -> Unit, doneActio
                     }
                 }
                 Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp), horizontalArrangement = Arrangement.End) {
-                    TextButton(onClick = {
-                        cancelAction()
-                    }) {
+                    TextButton(
+                        onClick = {
+                            cancelAction()
+                        }
+                    ) {
                         Text(stringResource(R.string.cancel_label))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    TextButton(onClick = {
-                        doneAction(3600 * h + 60 * m + s)
-                    }) {
+                    TextButton(
+                        onClick = {
+                            doneAction(3600 * h + 60 * m + s)
+                        }
+                    ) {
                         Text(stringResource(R.string.set_label))
                     }
                 }

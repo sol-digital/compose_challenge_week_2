@@ -15,7 +15,7 @@
     <string name="dialog_set_title">Set countdown</string>
 
     <string name="alarm_label">Alarm!</string>
-    <string name="alarm_text">It\'s the final countdown.</string>
+    <string name="alarm_text">Some action or sound.</string>
 
     <string name="close_label">Close</string>
     <string name="set_label">Set</string>

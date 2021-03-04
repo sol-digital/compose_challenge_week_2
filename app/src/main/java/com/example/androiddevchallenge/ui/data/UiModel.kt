@@ -28,13 +28,16 @@ class UiModel : ViewModel() {
     fun startCountdown() {
         timer?.cancel()
         timer = Timer().apply {
-            schedule(MyTimerTask {
-                secondsToAlarm--
-                if (secondsToAlarm <= 0) {
-                    stopCountdown()
-                    isDone = true
-                }
-            }, 1000, 1000)
+            schedule(
+                MyTimerTask {
+                    secondsToAlarm--
+                    if (secondsToAlarm <= 0) {
+                        stopCountdown()
+                        isDone = true
+                    }
+                },
+                1000, 1000
+            )
         }
         isRunning = true
     }
@@ -48,16 +51,12 @@ class UiModel : ViewModel() {
         stopCountdown()
         timer?.purge()
         timer = null
-        secondsToAlarm = countdown
+        secondsToAlarm = secondsCountdown
     }
 
     var isRunning by mutableStateOf(false)
-
     var isDone by mutableStateOf(false)
 
-    var countdown by mutableStateOf(300)
-
-    var secondsToAlarm by mutableStateOf(countdown)
-
-
+    var secondsCountdown by mutableStateOf(10)
+    var secondsToAlarm by mutableStateOf(secondsCountdown)
 }

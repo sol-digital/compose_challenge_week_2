@@ -21,4 +21,3 @@ data class LayoutGridParams(
     val gutter: Int,
     val cellSize: Double
 )
-
