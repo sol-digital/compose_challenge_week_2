@@ -15,14 +15,14 @@
  */
 package com.example.androiddevchallenge.ui.view
 
-
-
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -31,12 +31,18 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.NotStarted
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.PauseCircle
+import androidx.compose.material.icons.outlined.PlayCircle
+import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.androiddevchallenge.R
 import com.example.androiddevchallenge.ui.data.LayoutGridParams
 import com.example.androiddevchallenge.ui.data.UiModel
 import kotlin.math.max
@@ -111,7 +117,7 @@ fun MyApp() {
                     model.isDone = false
                 }
             ) {
-                Text("Close")
+                Text(stringResource(R.string.close_label))
             }
         }
     )
@@ -119,26 +125,59 @@ fun MyApp() {
     Surface(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "Timer", style = MaterialTheme.typography.h2)
+                val isAlarm = model.secondsToAlarm <= 0
+                Text(
+                    text = if (isAlarm) stringResource(R.string.alarm_label) else getTimeLabel(model.secondsToAlarm),
+                    style = MaterialTheme.typography.h2
+                )
                 Row(modifier = Modifier.padding(top = 32.dp)) {
                     IconButton(onClick = {
-                        model.isDone = true
+                        model.countdown = 5
+                        model.resetCountdown()
                     }) {
-                        Icon(Icons.Default.NotStarted, contentDescription = "Start")
+                        Icon(Icons.Outlined.Edit, contentDescription = "Edit", tint = colorResource(R.color.primary))
                     }
+                    Spacer(Modifier.width(16.dp))
                     IconButton(onClick = {
-                        model.isDone = true
+                        model.resetCountdown()
                     }) {
-                        Icon(Icons.Default.NotStarted, contentDescription = "Start")
+                        Icon(Icons.Outlined.RestartAlt, contentDescription = "Reset", tint = colorResource(R.color.reset))
                     }
-                    IconButton(onClick = {
-                        model.isDone = true
-                    }) {
-                        Icon(Icons.Default.NotStarted, contentDescription = "Start")
+                    Spacer(Modifier.width(16.dp))
+                    if (model.isRunning) {
+                        IconButton(
+                            onClick = {
+                                model.stopCountdown()
+                            },
+                            enabled = !isAlarm
+                        ) {
+                            Icon(Icons.Outlined.PauseCircle, contentDescription = "Stop", tint = colorResource(if (isAlarm) R.color.gray else R.color.stop))
+                        }
+                    } else {
+                        IconButton(
+                            onClick = {
+                                model.startCountdown()
+                            },
+                            enabled = !isAlarm
+                        ) {
+                            Icon(Icons.Outlined.PlayCircle, contentDescription = "Start", tint = colorResource(if (isAlarm) R.color.gray else R.color.start))
+                        }
                     }
                 }
             }
         }
     }
+}
+
+private fun getTimeLabel(seconds: Int): String {
+    val h = (seconds / 3600).toInt()
+    val m = ((seconds % 3600) / 60).toInt()
+    val s = seconds % 60
+
+    fun formatValue(value: Int) = value.toString().let {
+        if (it.length < 2) "0$it" else it
+    }
+
+    return "$h:${formatValue(m)}:${formatValue(s)}"
 }
 

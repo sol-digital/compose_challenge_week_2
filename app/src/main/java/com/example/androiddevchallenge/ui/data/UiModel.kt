@@ -19,9 +19,45 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import java.util.Timer
 
 class UiModel : ViewModel() {
 
+    private var timer: Timer? = null
+
+    fun startCountdown() {
+        timer?.cancel()
+        timer = Timer().apply {
+            schedule(MyTimerTask {
+                secondsToAlarm--
+                if (secondsToAlarm <= 0) {
+                    stopCountdown()
+                    isDone = true
+                }
+            }, 1000, 1000)
+        }
+        isRunning = true
+    }
+
+    fun stopCountdown() {
+        timer?.cancel()
+        isRunning = false
+    }
+
+    fun resetCountdown() {
+        stopCountdown()
+        timer?.purge()
+        timer = null
+        secondsToAlarm = countdown
+    }
+
+    var isRunning by mutableStateOf(false)
+
     var isDone by mutableStateOf(false)
+
+    var countdown by mutableStateOf(30)
+
+    var secondsToAlarm by mutableStateOf(countdown)
+
 
 }

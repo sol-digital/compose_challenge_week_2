@@ -16,9 +16,9 @@
     <color name="background">#000000</color>
 
     <!-- Light Green 200 -->
-    <color name="primary">#c5e1a5</color>
-    <color name="primaryLight">#f8ffd7</color>
-    <color name="primaryDark">#94af76</color>
+    <color name="primary">#9FA8DA</color>
+    <color name="primaryLight">#C5CAE9</color>
+    <color name="primaryDark">#7986CB</color>
     <color name="onPrimary">#000000</color>
 
     <!-- Deep Purple 200 -->
@@ -26,4 +26,8 @@
     <color name="secondaryLight">#e6ceff</color>
     <color name="secondaryDark">#836fa9</color>
     <color name="onSecondary">#000000</color>
+
+    <color name="reset">#EF9A9A</color>
+    <color name="start">#C5E1A5</color>
+    <color name="stop">#FFE082</color>
 </resources>

@@ -14,10 +14,7 @@
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
     <color name="gray">#808080</color>
-    <color name="gold">#c5b358</color>
-    <color name="sepia">#ac7a33</color>
 
-    <color name="splashBackground">#212121</color>
     <color name="statusBar">#ffffff</color>
     <color name="navBar">#212121</color>
     <color name="edgeEffect">#757575</color>
@@ -34,4 +31,8 @@
     <color name="secondaryLight">#5efc82</color>
     <color name="secondaryDark">#009624</color>
     <color name="onSecondary">#000000</color>
+
+    <color name="reset">#F44336</color>
+    <color name="start">#7CB342</color>
+    <color name="stop">#FFB300</color>
 </resources>
